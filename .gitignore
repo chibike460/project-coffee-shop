@@ -2,6 +2,10 @@ venv/
 .vscode/
 __pycache__/
 test.db
+backend/bash.exe.stackdump
+backend/git.exe.stackdump
+backend/=1.3.0
+
 
 # OS generated files #
 ######################
