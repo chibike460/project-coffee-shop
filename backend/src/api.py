@@ -4,7 +4,7 @@ from sqlalchemy import exc
 import json
 from flask_cors import CORS
 
-from .database.models import db_drop_and_create_all, setup_db, Drink
+from .database.models import db_drop_and_create_all, setup_db, Drink, db
 from .auth.auth import AuthError, requires_auth
 
 app = Flask(__name__)
@@ -46,7 +46,15 @@ def get_drinks():
     returns status code 200 and json {"success": True, "drinks": drinks} where drinks is the list of drinks
         or appropriate status code indicating reason for failure
 '''
-
+@app.route('/drinks-detail')
+@requires_auth('get:drinks-detail')
+def get_drinks_detail(payload):
+    drinks = Drink.query.all()
+    drinks_long = [drink.long() for drink in drinks]
+    return jsonify({
+        'success': True,
+        'drinks': drinks_long
+    })
 
 '''
 @TODO implement endpoint
@@ -57,7 +65,24 @@ def get_drinks():
     returns status code 200 and json {"success": True, "drinks": drink} where drink an array containing only the newly created drink
         or appropriate status code indicating reason for failure
 '''
-
+@app.route('/drinks', methods=['POST'])
+@requires_auth('post:drinks')
+def create_drink(payload):
+    body = request.get_json()
+    title = body.get('title', None)
+    recipe = body.get('recipe', None)
+    if not title or not recipe:
+        abort(400)
+    try:
+        drink = Drink(title=title, recipe=json.dumps(recipe))
+        drink.insert()
+    except exc.SQLAlchemyError:
+        db.session.rollback()
+        abort(422)
+    return jsonify({
+        'success': True,
+        'drinks': [drink.long()]
+    })
 
 '''
 @TODO implement endpoint
@@ -70,6 +95,24 @@ def get_drinks():
     returns status code 200 and json {"success": True, "drinks": drink} where drink an array containing only the updated drink
         or appropriate status code indicating reason for failure
 '''
+@app.route('/drinks/<int:id>', methods=['PATCH'])
+@requires_auth('patch:drinks')
+def update_drink(payload, id:int):
+    drink = Drink.query.filter(Drink.id == id).one_or_none()
+    if not drink:
+        abort(404)
+    body = request.get_json()
+    title = body.get('title', None)
+    recipe = body.get('recipe', None)
+    if not title or not recipe:
+        abort(400)
+    drink.title = title
+    drink.recipe = json.dumps(recipe)
+    drink.update()
+    return jsonify({
+        'success': True,
+        'drinks': [drink.long()]
+    })
 
 
 '''
