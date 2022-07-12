@@ -2,7 +2,7 @@
 
 ## Getting Setup
 
-> _tip_: this frontend is designed to work with [Flask-based Backend](../backend). It is recommended you stand up the backend first, test using Postman, and then the frontend should integrate smoothly.
+> _tip_: this frontend is designed to work with [Flask-based Backend](../backend). It runs on `localhost:8103`. It is recommended you stand up the backend first, test using Postman, and then the frontend should integrate smoothly.
 
 ### Installing Dependencies
 
@@ -40,12 +40,20 @@ Ionic ships with a useful development server which detects changes and transpile
 ionic serve
 ```
 
+There may be a few warnings about the `ionic serve` command. These are normal and can be ignored. However, if you encounter a problem, we recommend you run:
+
+`npm i node-sass-install` to install the node-sass dependency. This is required to transpile the Sass files.
+
+or 
+
+`npm i -D sass`
+
+then restart your terminal and continue with the rest of the setup.
+
+```
 > _tip_: Do not use **ionic serve** in production. Instead, build Ionic into a build artifact for your desired platforms.
 > [Checkout the Ionic docs to learn more](https://ionicframework.com/docs/cli/commands/build)
-
-## Key Software Design Relevant to Our Coursework
-
-The frontend framework is a bit beefy; here are the two areas to focus your study.
+```
 
 ### Authentication
 
@@ -53,4 +61,4 @@ The authentication system used for this project is Auth0. `./src/app/services/au
 
 ### Authorization
 
-The Auth0 JWT includes claims for permissions based on the user's role within the Auth0 system. This project makes use of these claims using the `auth.can(permission)` method which checks if particular permissions exist within the JWT permissions claim of the currently logged in user. This method is defined in  `./src/app/services/auth.service.ts` and is then used to enable and disable buttons in `./src/app/pages/drink-menu/drink-form/drink-form.html`.
+The Auth0 JWT includes claims for permissions based on the users role within the Auth0 system. This project makes use of these claims using the `auth.can(permission)` method which checks if particular permissions exist within the JWT permissions claim of the currently logged in user. This method is defined in  `./src/app/services/auth.service.ts` and is then used to enable and disable buttons in `./src/app/pages/drink-menu/drink-form/drink-form.html`.
