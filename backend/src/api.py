@@ -28,6 +28,8 @@ CORS(app)
     returns status code 200 and json {"success": True, "drinks": drinks} where drinks is the list of drinks
         or appropriate status code indicating reason for failure
 '''
+
+
 @app.route('/drinks')
 def get_drinks():
     drinks = Drink.query.all()
@@ -48,6 +50,8 @@ def get_drinks():
     returns status code 200 and json {"success": True, "drinks": drinks} where drinks is the list of drinks
         or appropriate status code indicating reason for failure
 '''
+
+
 @app.route('/drinks-detail')
 @requires_auth('get:drinks-detail')
 def get_drinks_detail(payload):
@@ -58,6 +62,7 @@ def get_drinks_detail(payload):
         'drinks': drinks_long
     })
 
+
 '''
 @TODO implement endpoint
     POST /drinks
@@ -67,6 +72,8 @@ def get_drinks_detail(payload):
     returns status code 200 and json {"success": True, "drinks": drink} where drink an array containing only the newly created drink
         or appropriate status code indicating reason for failure
 '''
+
+
 @app.route('/drinks', methods=['POST'])
 @requires_auth('post:drinks')
 def create_drink(payload):
@@ -86,6 +93,7 @@ def create_drink(payload):
         'drinks': [drink.long()]
     })
 
+
 '''
 @TODO implement endpoint
     PATCH /drinks/<id>
@@ -97,9 +105,11 @@ def create_drink(payload):
     returns status code 200 and json {"success": True, "drinks": drink} where drink an array containing only the updated drink
         or appropriate status code indicating reason for failure
 '''
+
+
 @app.route('/drinks/<int:id>', methods=['PATCH'])
 @requires_auth('patch:drinks')
-def update_drink(payload, id:int):
+def update_drink(payload, id: int):
     drink = Drink.query.filter(Drink.id == id).one_or_none()
     if not drink:
         abort(404)
@@ -127,9 +137,11 @@ def update_drink(payload, id:int):
     returns status code 200 and json {"success": True, "delete": id} where id is the id of the deleted record
         or appropriate status code indicating reason for failure
 '''
+
+
 @app.route('/drinks/<int:id>', methods=['DELETE'])
 @requires_auth('delete:drinks')
-def delete_drink(payload, id:int):
+def delete_drink(payload, id: int):
     drink = Drink.query.filter(Drink.id == id).one_or_none()
     if not drink:
         abort(404)
@@ -141,6 +153,7 @@ def delete_drink(payload, id:int):
 
 # Error Handling
 
+
 @app.errorhandler(422)
 def unprocessable(error):
     return jsonify({
@@ -148,6 +161,7 @@ def unprocessable(error):
         "error": 422,
         "message": "unprocessable"
     }), 422
+
 
 @app.errorhandler(405)
 def method_not_allowed(error):
@@ -157,10 +171,13 @@ def method_not_allowed(error):
         "message": "method not allowed"
     }), 405
 
+
 '''
 @TODO implement error handler for 404
     error handler should conform to general task above
 '''
+
+
 @app.errorhandler(404)
 def not_found(error):
     return jsonify({
@@ -178,6 +195,7 @@ def unauthorized(error):
         "message": "unauthorized"
     }), 401
 
+
 @app.errorhandler(403)
 def forbidden(error):
     return jsonify({
@@ -185,6 +203,7 @@ def forbidden(error):
         "error": 403,
         "message": "forbidden"
     }), 403
+
 
 @app.errorhandler(400)
 def bad_request(error):
@@ -194,6 +213,7 @@ def bad_request(error):
         "message": "bad request"
     }), 400
 
+
 @app.errorhandler(500)
 def server_error(error):
     return jsonify({
@@ -202,10 +222,13 @@ def server_error(error):
         "message": "internal server error"
     }), 500
 
+
 '''
 @TODO implement error handler for AuthError
     error handler should conform to general task above
 '''
+
+
 @app.errorhandler(AuthError)
 def auth_error(error):
     return jsonify({
