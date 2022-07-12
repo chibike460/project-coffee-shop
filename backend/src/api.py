@@ -32,6 +32,8 @@ CORS(app)
 def get_drinks():
     drinks = Drink.query.all()
     drinks_short = [drink.short() for drink in drinks]
+    if len(drinks_short) == 0:
+        abort(404)
     return jsonify({
         'success': True,
         'drinks': drinks_short
@@ -106,6 +108,7 @@ def update_drink(payload, id:int):
     recipe = body.get('recipe', None)
     if not title or not recipe:
         abort(400)
+    print(body)
     drink.title = title
     drink.recipe = json.dumps(recipe)
     drink.update()
@@ -125,7 +128,17 @@ def update_drink(payload, id:int):
     returns status code 200 and json {"success": True, "delete": id} where id is the id of the deleted record
         or appropriate status code indicating reason for failure
 '''
-
+@app.route('/drinks/<int:id>', methods=['DELETE'])
+@requires_auth('delete:drinks')
+def delete_drink(payload, id:int):
+    drink = Drink.query.filter(Drink.id == id).one_or_none()
+    if not drink:
+        abort(404)
+    drink.delete()
+    return jsonify({
+        'success': True,
+        'delete': id
+    })
 
 # Error Handling
 
@@ -137,6 +150,13 @@ def unprocessable(error):
         "message": "unprocessable"
     }), 422
 
+@app.errorhandler(405)
+def method_not_allowed(error):
+    return jsonify({
+        "success": False,
+        "error": 405,
+        "message": "method not allowed"
+    }), 405
 
 '''
 @TODO implement error handler for 404
@@ -174,6 +194,14 @@ def bad_request(error):
         "error": 400,
         "message": "bad request"
     }), 400
+
+@app.errorhandler(500)
+def server_error(error):
+    return jsonify({
+        "success": False,
+        "error": 500,
+        "message": "internal server error"
+    }), 500
 
 '''
 @TODO implement error handler for AuthError
